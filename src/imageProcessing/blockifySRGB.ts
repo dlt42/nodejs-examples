@@ -8,12 +8,13 @@ export const blockifySRGB = async ({
   inputFilename,
   outputFilename,
   fillAlpha = false,
+  split = 20,
 }: {
   inputFilename: string;
   outputFilename: string;
   fillAlpha?: boolean;
+  split?: number;
 }): Promise<void> => {
-  const split = 20;
   const channelBufferArray: Buffer[] = new Array<Buffer>(4);
 
   // Load the image and extract the raw data

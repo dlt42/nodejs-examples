@@ -9,4 +9,5 @@ blockifySRGB({
   inputFilename: 'input.png',
   outputFilename: 'output_srgb_blockify.png',
   fillAlpha: false,
+  split: 30,
 });
