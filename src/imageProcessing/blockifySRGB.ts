@@ -1,5 +1,6 @@
 import sharp from 'sharp';
 import fs from 'fs';
+import { blockify } from './blockify';
 
 type Channel = 'red' | 'green' | 'blue' | 'alpha';
 type ChannelCount = 1 | 2 | 3 | 4;
@@ -25,22 +26,17 @@ export const blockifySRGB = async ({
   if (width === undefined || height === undefined)
     throw Error('Unable to determine image dimensions');
 
-  // Calculate the dimensions of each block
-  const blockWidth = Math.floor(width / split);
-  const blockHeight = Math.floor(height / split);
-  const blockLength = blockWidth * blockHeight;
-
   // Process each channel in the raw image data
   const channelArray: Channel[] = ['red', 'green', 'blue', 'alpha'];
   await Promise.all(
     channelArray.map(async (currentChannel, channelIndex) => {
       // Get the buffer for the current channel
-      const { data: channelBufferData } = await raw
+      const { data: bufferData } = await raw
         .extractChannel(currentChannel)
         .toBuffer({ resolveWithObject: true });
 
       // Convert the buffer data for processing
-      const pixelArray = new Uint8ClampedArray(channelBufferData.buffer);
+      const pixelArray = new Uint8ClampedArray(bufferData.buffer);
 
       // If the current channel is Alpha then fill it so there is no transparency
       if (fillAlpha && currentChannel === 'alpha') {
@@ -51,32 +47,12 @@ export const blockifySRGB = async ({
         return;
       }
 
-      // Iterate through the blocks to be processed
-      for (let x = 0; x < split; x++) {
-        for (let y = 0; y < split; y++) {
-          // Determine the top left and bottom right coordinates of the current block
-          const sx = x * blockWidth;
-          const sy = y * blockHeight;
-          const ex = (x + 1) * blockWidth;
-          const ey = (y + 1) * blockHeight;
-
-          // Calculate the average value for the current block
-          let sum = 0;
-          const subArrays = [];
-          for (let iy = sy; iy < ey; iy++) {
-            const subArray = channelBufferData.subarray(
-              sx + width * iy,
-              ex + width * iy,
-            );
-            sum += subArray.reduce((prev, current) => prev + current, 0);
-            subArrays.push(subArray);
-          }
-
-          // Fill the block with the average value
-          const average = sum / blockLength;
-          subArrays.forEach((subArray) => subArray.fill(average));
-        }
-      }
+      blockify({
+        bufferData,
+        height,
+        split,
+        width,
+      });
 
       // Store the buffer data
       channelBufferArray[channelIndex] = Buffer.from(pixelArray);
