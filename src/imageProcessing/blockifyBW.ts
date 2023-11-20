@@ -1,21 +1,24 @@
 import sharp from 'sharp';
 
-export const blockify = async (
-  inputFilename: string,
-  outputFilename: string,
-  colourspace: string,
-) => {
+export const blockifyBW = async ({
+  inputFilename,
+  outputFilename,
+}: {
+  inputFilename: string;
+  outputFilename: string;
+}) => {
   const { data, info } = await sharp(inputFilename)
     .ensureAlpha()
-    .toColourspace(colourspace)
+    .toColourspace('b-w')
     .raw()
     .toBuffer({ resolveWithObject: true });
   const pixelArray = new Uint8ClampedArray(data.buffer);
   const { width, height, channels } = info;
-  const blockWidth = width / 10;
-  const blockHeight = height / 10;
-  for (let x = 0; x < 10; x++) {
-    for (let y = 0; y < 10; y++) {
+  const split = 20;
+  const blockWidth = width / split;
+  const blockHeight = height / split;
+  for (let x = 0; x < split; x++) {
+    for (let y = 0; y < split; y++) {
       const sx = x * blockWidth;
       const sy = y * blockHeight;
       const ex = (x + 1) * blockWidth;
