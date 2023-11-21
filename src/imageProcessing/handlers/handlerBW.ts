@@ -1,15 +1,17 @@
 import sharp from 'sharp';
 import fs from 'fs';
-import { blockify } from './blockify';
+import { Processor } from '../processors/processor';
 
-export const blockifyBW = async ({
+export const handlerBW = async <T extends object>({
   inputFilename,
   outputFilename,
-  split = 20,
+  params,
+  processor,
 }: {
   inputFilename: string;
   outputFilename: string;
-  split?: number;
+  params: T;
+  processor: Processor<T>;
 }): Promise<void> => {
   // Load the image and extract the raw data
   const { data: bufferData, info } = await sharp(inputFilename)
@@ -18,17 +20,13 @@ export const blockifyBW = async ({
     .raw()
     .toBuffer({ resolveWithObject: true });
 
-  // Convert the buffer data for processing
-  const pixelArray = new Uint8ClampedArray(bufferData.buffer);
-
-  // Calculate the dimensions of each block
+  // Get the dimensions
   const { width, height, channels } = info;
-
-  blockify({
+  processor({
     bufferData,
     height,
-    split,
     width,
+    ...params,
   });
 
   // If the output file already exists delete it
@@ -36,7 +34,7 @@ export const blockifyBW = async ({
     fs.unlinkSync(outputFilename);
 
   // Output the result as a PNG
-  await sharp(pixelArray, { raw: { width, height, channels } })
+  await sharp(bufferData, { raw: { width, height, channels } })
     .toFormat('png')
     .toFile(outputFilename);
 };

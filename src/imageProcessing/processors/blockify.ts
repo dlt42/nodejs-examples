@@ -1,4 +1,10 @@
-export const blockify = ({
+import { Processor } from './processor';
+
+export type BlockifyParams = {
+  split: number;
+};
+
+export const blockify: Processor<BlockifyParams> = ({
   width,
   height,
   split,

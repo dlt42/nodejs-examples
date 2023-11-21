@@ -1,20 +1,22 @@
 import sharp from 'sharp';
 import fs from 'fs';
-import { blockify } from './blockify';
+import { Processor } from '../processors/processor';
 
 type Channel = 'red' | 'green' | 'blue' | 'alpha';
 type ChannelCount = 1 | 2 | 3 | 4;
 
-export const blockifySRGB = async ({
+export const handlerSRGB = async <T extends object>({
   inputFilename,
   outputFilename,
   fillAlpha = false,
-  split = 20,
+  params,
+  processor,
 }: {
   inputFilename: string;
   outputFilename: string;
   fillAlpha?: boolean;
-  split?: number;
+  params: T;
+  processor: Processor<T>;
 }): Promise<void> => {
   const channelBufferArray: Buffer[] = new Array<Buffer>(4);
 
@@ -47,11 +49,12 @@ export const blockifySRGB = async ({
         return;
       }
 
-      blockify({
+      // Get the dimensions
+      processor({
         bufferData,
         height,
-        split,
         width,
+        ...params,
       });
 
       // Store the buffer data
