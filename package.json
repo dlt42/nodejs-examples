@@ -27,11 +27,13 @@
   "dependencies": {
     "canvas": "^2.11.2",
     "gifencoder": "^2.0.1",
+    "is-valid-path": "^0.1.1",
     "jest-cucumber": "^3.0.1",
     "sharp": "^0.32.6",
     "stream": "^0.0.2"
   },
   "devDependencies": {
+    "@types/is-valid-path": "^0.1.2",
     "@types/jest": "^28.1.8",
     "@types/node": "^18.6.1",
     "@typescript-eslint/eslint-plugin": "^5.31.0",

@@ -1,20 +1,15 @@
-import { BlockifyParams, blockify } from '../processors/blockify';
+import { BlockifyConfig, blockify } from '../processors/blockify';
 import { handlerSRGB } from '../handlers/handlerSRGB';
 
 export const blockifySRGB = async ({
-  inputFilename,
-  outputFilename,
-  fillAlpha = false,
-  params,
-}: {
-  inputFilename: string;
-  outputFilename: string;
-  fillAlpha?: boolean;
-  params: BlockifyParams;
-}): Promise<void> => {
+  input,
+  output,
+  fillAlpha,
+  params = { split: 20 },
+}: BlockifyConfig): Promise<void> => {
   handlerSRGB({
-    inputFilename,
-    outputFilename,
+    input,
+    output,
     fillAlpha,
     params,
     processor: blockify,

@@ -1,20 +1,15 @@
 import { handlerSRGB } from '../handlers/handlerSRGB';
-import { BandifyParams, bandify } from '../processors/bandify';
+import { BandifyConfig, BandifyParams, bandify } from '../processors/bandify';
 
 export const bandifySRGB = async ({
-  inputFilename,
-  outputFilename,
+  input,
+  output,
   fillAlpha = false,
-  params = { bandWidth: 2 },
-}: {
-  inputFilename: string;
-  outputFilename: string;
-  fillAlpha?: boolean;
-  params?: BandifyParams;
-}): Promise<void> => {
+  params = { band: 2 },
+}: BandifyConfig): Promise<void> => {
   handlerSRGB<BandifyParams>({
-    inputFilename,
-    outputFilename,
+    input,
+    output,
     fillAlpha,
     params,
     processor: bandify,

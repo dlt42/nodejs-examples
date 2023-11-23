@@ -1,35 +1,29 @@
+/* eslint-disable no-console */
+import { getErrorMessage } from '../handlers/utils';
+import { grabStringFlag, grabNumericFlag } from './flag';
 import { bandifyBW } from '../operations/bandifyBW';
 import { bandifySRGB } from '../operations/bandifySRGB';
+import { bandFlag } from './flags/bandFlag';
+import { outputFlag } from './flags/outputFlag';
+import { inputFlag } from './flags/inputFlag';
+import { modeFlag } from './flags/modeFlag';
 
-bandifyBW({
-  inputFilename: 'input.png',
-  outputFilename: 'output_b-w_bandify_4.png',
-  params: { bandWidth: 4 },
-});
-bandifyBW({
-  inputFilename: 'input.png',
-  outputFilename: 'output_b-w_bandify_6.png',
-  params: { bandWidth: 6 },
-});
-bandifyBW({
-  inputFilename: 'input.png',
-  outputFilename: 'output_b-w_bandify_16.png',
-  params: { bandWidth: 16 },
-});
+try {
+  const mode = grabStringFlag(modeFlag);
+  const output = grabStringFlag(outputFlag);
+  const input = grabStringFlag(inputFlag);
+  const band = grabNumericFlag(bandFlag);
 
-bandifySRGB({
-  inputFilename: 'input.png',
-  outputFilename: 'output_srgb_bandify_4.png',
-  params: { bandWidth: 4 },
-});
-bandifySRGB({
-  inputFilename: 'input.png',
-  outputFilename: 'output_srgb_bandify_6.png',
-  params: { bandWidth: 6 },
-});
-bandifySRGB({
-  inputFilename: 'input.png',
-  outputFilename: 'output_srgb_bandify_16.png',
-  fillAlpha: true,
-  params: { bandWidth: 16 },
-});
+  const params = {
+    input,
+    output,
+    params: {
+      band,
+    },
+  };
+  if (mode === 'bw') bandifyBW(params);
+  if (mode === 'col') bandifySRGB(params);
+} catch (e) {
+  console.error(getErrorMessage(e));
+  console.error(JSON.stringify(process.argv));
+}

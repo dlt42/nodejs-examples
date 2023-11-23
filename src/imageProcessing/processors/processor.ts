@@ -1,6 +1,6 @@
 type ProcessorParams = {
   height: number;
-  bufferData: Buffer;
+  pixelArray: Uint8ClampedArray;
   width: number;
 };
 

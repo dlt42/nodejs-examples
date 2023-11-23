@@ -1,18 +1,14 @@
-import { BlockifyParams, blockify } from '../processors/blockify';
+import { BlockifyConfig, blockify } from '../processors/blockify';
 import { handlerBW } from '../handlers/handlerBW';
 
 export const blockifyBW = async ({
-  inputFilename,
-  outputFilename,
+  input,
+  output,
   params = { split: 20 },
-}: {
-  inputFilename: string;
-  outputFilename: string;
-  params?: BlockifyParams;
-}): Promise<void> => {
+}: BlockifyConfig): Promise<void> => {
   handlerBW({
-    inputFilename,
-    outputFilename,
+    input,
+    output,
     processor: blockify,
     params,
   });

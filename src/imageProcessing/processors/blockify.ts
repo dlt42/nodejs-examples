@@ -4,16 +4,18 @@ export type BlockifyParams = {
   split: number;
 };
 
+export type BlockifyConfig = {
+  input: string;
+  output: string;
+  fillAlpha?: boolean;
+  params?: BlockifyParams;
+};
+
 export const blockify: Processor<BlockifyParams> = ({
   width,
   height,
   split,
-  bufferData,
-}: {
-  height: number;
-  width: number;
-  split: number;
-  bufferData: Buffer;
+  pixelArray,
 }) => {
   // Calculate the dimensions of each block
   const blockWidth = Math.ceil(width / split);
@@ -49,7 +51,7 @@ export const blockify: Processor<BlockifyParams> = ({
       let sum = 0;
       const subArrays = [];
       for (let iy = sy; iy < ey; iy++) {
-        const subArray = bufferData.subarray(sx + width * iy, ex + width * iy);
+        const subArray = pixelArray.subarray(sx + width * iy, ex + width * iy);
         sum += subArray.reduce((prev, current) => prev + current, 0);
         subArrays.push(subArray);
       }

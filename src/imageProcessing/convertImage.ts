@@ -7,15 +7,15 @@ import sharp from 'sharp';
 type Channel = 0 | 'alpha' | 1 | 2 | 3 | 'red' | 'green' | 'blue';
 
 export const convertImage = async (
-  inputFilename: string,
-  outputFilename: string,
+  input: string,
+  output: string,
   channel: Channel | undefined,
   colourspace: string,
 ) => {
   let writeStream: WriteStream | null = null;
   try {
     // Create and configure the input buffer for image conversion
-    let data = await sharp(inputFilename)
+    let data = await sharp(input)
       .ensureAlpha()
       .resize(100, 100, {
         kernel: sharp.kernel.cubic,
@@ -29,9 +29,9 @@ export const convertImage = async (
     const buffer = await data.toBuffer();
 
     // Ensure an output filename
-    const extension = path.extname(inputFilename);
-    const basename = path.basename(inputFilename, extension);
-    outputFilename ??= `${basename}-converted.png`;
+    const extension = path.extname(input);
+    const basename = path.basename(input, extension);
+    output ??= `${basename}-converted.png`;
 
     // Create a stream for the input buffer
     const inputStream = Readable.from(buffer);
@@ -42,7 +42,7 @@ export const convertImage = async (
       console.log('========================================');
 
       // ...create the output file stream
-      writeStream = fs.createWriteStream(outputFilename);
+      writeStream = fs.createWriteStream(output);
     });
 
     // For each chunk the input stream gets...

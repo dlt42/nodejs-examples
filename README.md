@@ -30,3 +30,24 @@ Formats the code.
 #### `npm run prettier-watch`
 
 Format the code in watch mode.
+
+
+#### `npm run blockifyTest`
+
+Examples:
+
+```
+npm run blockifyTest -- --output ouputColBlockify.png --input input.png --split 40 
+
+npm run blockifyTest -- --output ouputBWBlockify.png --input input.png --split 10 --mode bw
+```
+
+#### `npm run bandifyTest`
+
+Examples:
+
+```
+npm run bandifyTest -- --output ouputColBandify.png --input input.png --band 4 
+
+npm run bandifyTest -- --output ouputBWBandify.png --input input.png --band 8 --mode bw
+```

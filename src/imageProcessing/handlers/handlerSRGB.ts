@@ -1,27 +1,29 @@
 import sharp from 'sharp';
-import fs from 'fs';
 import { Processor } from '../processors/processor';
+import { checkFile } from './utils';
 
 type Channel = 'red' | 'green' | 'blue' | 'alpha';
 type ChannelCount = 1 | 2 | 3 | 4;
 
-export const handlerSRGB = async <T extends object>({
-  inputFilename,
-  outputFilename,
-  fillAlpha = false,
-  params,
-  processor,
-}: {
-  inputFilename: string;
-  outputFilename: string;
+type HandlerSrgbParams<T extends object> = {
+  input: string;
+  output: string;
   fillAlpha?: boolean;
   params: T;
   processor: Processor<T>;
-}): Promise<void> => {
+};
+
+export const handlerSRGB = async <T extends object>({
+  input,
+  output,
+  fillAlpha = false,
+  params,
+  processor,
+}: HandlerSrgbParams<T>): Promise<void> => {
   const channelBufferArray: Buffer[] = new Array<Buffer>(4);
 
   // Load the image and extract the raw data
-  const raw = await sharp(inputFilename).ensureAlpha().raw();
+  const raw = await sharp(input).ensureAlpha().raw();
 
   // Get the image dimensions for subsequent calculations
   const { width, height } = await raw.metadata();
@@ -37,34 +39,36 @@ export const handlerSRGB = async <T extends object>({
         .extractChannel(currentChannel)
         .toBuffer({ resolveWithObject: true });
 
-      // Convert the buffer data for processing
+      // Convert the buffer data for more type safe processing
+      // Uint8ClampedArray clamps values between 0 and 255 and doesn't create a copy of the data in the passed ArrayBuffer
+      // Instead it changes the passed ArrayBuffer so that both it and the Uint8ClampedArray point to the same memory location.
       const pixelArray = new Uint8ClampedArray(bufferData.buffer);
 
-      // If the current channel is Alpha then fill it so there is no transparency
+      // If configured via the parameters and the current channel is Alpha then fill it so there is no transparency
       if (fillAlpha && currentChannel === 'alpha') {
         pixelArray.fill(255);
 
-        // Store the buffer data
+        // Convert the array to a buffer and store it
         channelBufferArray[channelIndex] = Buffer.from(pixelArray);
         return;
       }
 
-      // Get the dimensions
+      // Process the channel data
       processor({
-        bufferData,
+        pixelArray,
         height,
         width,
         ...params,
       });
 
       // Store the buffer data
-      channelBufferArray[channelIndex] = Buffer.from(pixelArray);
+      // Could use Buffer.from(pixelArray) instead but they're both the same thing
+      channelBufferArray[channelIndex] = bufferData;
     }),
   );
 
-  // If the output file already exists delete it
-  if (fs.existsSync(outputFilename) && fs.statSync(outputFilename).isFile())
-    fs.unlinkSync(outputFilename);
+  // Check the output  and delete the file if it exists
+  checkFile(output);
 
   // Prepare the metadata for recombining the channel buffers
   const dataChannelCount: ChannelCount = 1;
@@ -83,5 +87,5 @@ export const handlerSRGB = async <T extends object>({
     .joinChannel(channelBufferArray[3], options)
     .toColourspace('srgb')
     .toFormat('png')
-    .toFile(outputFilename);
+    .toFile(output);
 };
