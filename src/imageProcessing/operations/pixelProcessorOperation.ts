@@ -1,10 +1,10 @@
 import { handlerBW } from '../handlers/handlerBW';
 import { handlerSRGB } from '../handlers/handlerSRGB';
 import { PixelProcessorParams, Processor } from '../processors/processor';
-import { Config } from './operation';
+import { Config, Mode } from './operation';
 
 export const pixelProcessorOperation = async <T extends object>(
-  params: Config<T>,
+  params: Config<T> & Mode,
   processor: Processor<T, PixelProcessorParams>,
 ): Promise<void> => {
   switch (params.mode) {

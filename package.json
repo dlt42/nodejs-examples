@@ -7,6 +7,7 @@
     "convertImageTest": "npx ts-node ./src/imageProcessing/convertImageTest",
     "bandifyExecutable": "npx ts-node ./src/imageProcessing/executable/bandifyExecutable",
     "blockifyExecutable": "npx ts-node ./src/imageProcessing/executable/blockifyExecutable",
+    "splitifyExecutable": "npx ts-node ./src/imageProcessing/executable/splitifyExecutable",
     "build": "rimraf ./build && tsc",
     "start:dev": "npx nodemon",
     "start": "npm run build && node build/index.js",

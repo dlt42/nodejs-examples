@@ -8,9 +8,17 @@ type IsUnion<T> = [T] extends [UnionToIntersection<T>] ? false : true;
 
 type Options<T> = IsUnion<T> extends true ? Readonly<T[]> : never;
 
+type NumericAny<T> = IsUnion<T> extends true
+  ? never
+  : T extends number
+  ? number
+  : never;
+
 export type FlagConfig<T> = {
   options?: Options<T>;
   defaultValue?: T;
+  min?: NumericAny<T>;
+  max?: NumericAny<T>;
 };
 
 type Flag<T, C extends FlagConfig<T>> = {
@@ -18,6 +26,7 @@ type Flag<T, C extends FlagConfig<T>> = {
   flag: string;
   description: string;
   prepareValue: (value: string) => T;
+  validateValue?: (value: T) => void;
 };
 
 type GetFlagErrorParams = {
@@ -35,6 +44,7 @@ const grabFlag = <T, C extends FlagConfig<T>>({
   description,
   flag,
   prepareValue,
+  validateValue,
 }: Flag<T, C>): T => {
   const { defaultValue, options } = config;
   const flagIndex = process.argv.indexOf(flag);
@@ -83,13 +93,15 @@ const grabFlag = <T, C extends FlagConfig<T>>({
       description,
     });
   }
-
+  if (validateValue) {
+    validateValue(value);
+  }
   return value;
 };
 
 export type GrabFlagParams<T, C extends FlagConfig<T>> = Omit<
   Flag<T, C>,
-  'prepareValue'
+  'prepareValue' | 'validateValue'
 >;
 
 export const grabStringFlag = <T, C extends FlagConfig<T>>(
@@ -115,5 +127,41 @@ export const grabNumericFlag = <T, C extends FlagConfig<T>>(
         });
       }
       return Number.parseInt(flagValue) as T;
+    },
+  });
+
+export const grabRangedNumericFlag = <T, C extends FlagConfig<T>>(
+  params: GrabFlagParams<T, C>,
+): T =>
+  grabFlag<T, C>({
+    ...params,
+    prepareValue: (flagValue: string) => {
+      if (Number.isNaN(flagValue)) {
+        const { flag, description } = params;
+        throw getFlagError({
+          flag,
+          message: 'flag specified but value not a number',
+          description,
+        });
+      }
+      return Number.parseInt(flagValue) as T;
+    },
+    validateValue: (value: T) => {
+      const { flag, description } = params;
+      if (typeof value === 'number') {
+        if (params.config.max !== undefined && value > params.config.max)
+          throw getFlagError({
+            flag,
+            message: 'flag specified but value is greater than max',
+            description,
+          });
+        if (params.config.min !== undefined && value < params.config.min)
+          throw getFlagError({
+            flag,
+            message: 'flag specified but value is lesser than min',
+            description,
+          });
+      }
+      return true;
     },
   });
