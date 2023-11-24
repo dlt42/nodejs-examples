@@ -53,7 +53,7 @@ npm run bandifyExecutable -- --output ouputBWBandify.png --input input.png --ban
 ```
 
 
-TODO: Remove this -
+TODO: Remove this
 npm run blockifyExecutable -- --output ouputColBlockify.png --input input.png --split 40 
 npm run blockifyExecutable -- --output ouputBWBlockify.png --input input.png --split 10 --mode bw
 npm run bandifyExecutable -- --output ouputColBandify.png --input input.png --band 4 

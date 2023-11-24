@@ -17,9 +17,9 @@ export type SharpProcessorParams = ProcessorBaseParams & {
   sharp: Sharp;
 };
 
-type ProcessorParams = PixelProcessorParams | SharpProcessorParams;
+export type ProcessorParams = PixelProcessorParams | SharpProcessorParams;
 
-type Processor<T extends object, P extends ProcessorParams> = (
+export type Processor<T extends object, P extends ProcessorParams> = (
   params: T & P,
 ) => P extends PixelProcessorParams ? void : Promise<Sharp>;
 
