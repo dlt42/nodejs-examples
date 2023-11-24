@@ -1,22 +1,28 @@
-import { Processor } from './processor';
+import { PixelProcessor } from './processor';
+
+export const splitOptions = [2, 4, 6, 8, 10, 20, 30, 40, 50, 60, 70] as const;
+
+export type SplitOptions = (typeof splitOptions)[number];
 
 export type BlockifyParams = {
-  split: number;
+  split: SplitOptions;
+  fillAlpha: boolean;
 };
 
-export type BlockifyConfig = {
-  input: string;
-  output: string;
-  fillAlpha?: boolean;
-  params?: BlockifyParams;
-};
-
-export const blockify: Processor<BlockifyParams> = ({
+export const blockifyProcessor: PixelProcessor<BlockifyParams> = ({
   width,
   height,
   split,
   pixelArray,
+  fillAlpha,
+  currentChannel,
 }) => {
+  // If configured via the parameters and the current channel is Alpha then fill it so there is no transparency
+  if (fillAlpha && currentChannel === 'alpha') {
+    pixelArray.fill(255);
+    return;
+  }
+
   // Calculate the dimensions of each block
   const blockWidth = Math.ceil(width / split);
   const blockHeight = Math.ceil(height / split);

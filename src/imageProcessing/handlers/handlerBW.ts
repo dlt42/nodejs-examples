@@ -1,20 +1,12 @@
 import sharp from 'sharp';
-import { Processor } from '../processors/processor';
-import { checkFile } from './utils';
+import { PixelProcessorParam } from '../processors/processor';
+import { checkFile } from './handler';
+import { Config } from '../operations/operation';
 
-type HandlerBwParams<T extends object> = {
-  input: string;
-  output: string;
-  params: T;
-  processor: Processor<T>;
-};
-
-export const handlerBW = async <T extends object>({
-  input,
-  output,
-  params,
-  processor,
-}: HandlerBwParams<T>): Promise<void> => {
+export const handlerBW = async <T extends object>(
+  params: Config<T> & PixelProcessorParam<T>,
+): Promise<void> => {
+  const { input, output, processor } = params;
   // Load the image, convert to black and white, and extract the raw data
   const { data: bufferData, info } = await sharp(input)
     .ensureAlpha()
@@ -31,8 +23,10 @@ export const handlerBW = async <T extends object>({
   const { width, height, channels } = info;
 
   // Process the data
-  processor({
+  await processor({
+    type: 'pixel',
     pixelArray,
+    currentChannel: null,
     height,
     width,
     ...params,

@@ -1,8 +1,7 @@
 /* eslint-disable no-console */
-import { getErrorMessage } from '../handlers/utils';
-import { grabStringFlag, grabNumericFlag } from './flag';
-import { blockifyBW } from '../operations/blockifyBW';
-import { blockifySRGB } from '../operations/blockifySRGB';
+import { getErrorMessage } from './executable';
+import { grabStringFlag, grabNumericFlag } from './flags/flag';
+import { blockifyOperation } from '../operations/blockifyOperation';
 import { splitFlag } from './flags/splitFlag';
 import { outputFlag } from './flags/outputFlag';
 import { inputFlag } from './flags/inputFlag';
@@ -13,16 +12,13 @@ try {
   const output = grabStringFlag(outputFlag);
   const input = grabStringFlag(inputFlag);
   const split = grabNumericFlag(splitFlag);
-
-  const params = {
+  blockifyOperation({
     input,
     output,
-    params: {
-      split,
-    },
-  };
-  if (mode === 'bw') blockifyBW(params);
-  if (mode === 'col') blockifySRGB(params);
+    split,
+    mode,
+    fillAlpha: false,
+  });
 } catch (e) {
   console.log(getErrorMessage(e));
   console.log(JSON.stringify(process.argv));

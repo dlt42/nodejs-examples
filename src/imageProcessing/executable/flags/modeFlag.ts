@@ -1,8 +1,5 @@
-import { FlagConfig, GrabFlagParams } from '../flag';
-
-const modeOptions = ['bw', 'col'] as const;
-
-type ModeOptions = (typeof modeOptions)[number];
+import { ModeOptions, modeOptions } from '../../operations/operation';
+import { FlagConfig, GrabFlagParams } from './flag';
 
 const modeConfig: FlagConfig<ModeOptions> = {
   options: modeOptions,

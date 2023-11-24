@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "convertImageTest": "npx ts-node ./src/imageProcessing/convertImageTest",
-    "bandifyTest": "npx ts-node ./src/imageProcessing/executable/bandifyTest",
-    "blockifyTest": "npx ts-node ./src/imageProcessing/executable/blockifyTest",
+    "bandifyExecutable": "npx ts-node ./src/imageProcessing/executable/bandifyExecutable",
+    "blockifyExecutable": "npx ts-node ./src/imageProcessing/executable/blockifyExecutable",
     "build": "rimraf ./build && tsc",
     "start:dev": "npx nodemon",
     "start": "npm run build && node build/index.js",

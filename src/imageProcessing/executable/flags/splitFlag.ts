@@ -1,8 +1,5 @@
-import { FlagConfig, GrabFlagParams } from '../flag';
-
-const splitOptions = [2, 4, 6, 8, 10, 20, 30, 40, 50, 60, 70] as const;
-
-type SplitOptions = (typeof splitOptions)[number];
+import { SplitOptions, splitOptions } from '../../processors/blockifyProcessor';
+import { FlagConfig, GrabFlagParams } from './flag';
 
 const splitConfig: FlagConfig<SplitOptions> = {
   options: splitOptions,

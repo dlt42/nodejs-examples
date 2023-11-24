@@ -1,8 +1,5 @@
-import { FlagConfig, GrabFlagParams } from '../flag';
-
-const bandOptions = [2, 4, 6, 8, 10, 12, 14] as const;
-
-type BandOptions = (typeof bandOptions)[number];
+import { BandOptions, bandOptions } from '../../processors/bandifyProcessor';
+import { FlagConfig, GrabFlagParams } from './flag';
 
 const bandConfig: FlagConfig<BandOptions> = {
   options: bandOptions,

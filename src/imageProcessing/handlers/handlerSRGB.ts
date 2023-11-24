@@ -1,25 +1,15 @@
 import sharp from 'sharp';
-import { Processor } from '../processors/processor';
-import { checkFile } from './utils';
+import { PixelProcessorParam } from '../processors/processor';
+import { checkFile } from './handler';
+import { Config } from '../operations/operation';
 
-type Channel = 'red' | 'green' | 'blue' | 'alpha';
-type ChannelCount = 1 | 2 | 3 | 4;
+export type Channel = 'red' | 'green' | 'blue' | 'alpha';
 
-type HandlerSrgbParams<T extends object> = {
-  input: string;
-  output: string;
-  fillAlpha?: boolean;
-  params: T;
-  processor: Processor<T>;
-};
+export const handlerSRGB = async <T extends object>(
+  params: Config<T> & PixelProcessorParam<T>,
+): Promise<void> => {
+  const { input, output, processor } = params;
 
-export const handlerSRGB = async <T extends object>({
-  input,
-  output,
-  fillAlpha = false,
-  params,
-  processor,
-}: HandlerSrgbParams<T>): Promise<void> => {
   const channelBufferArray: Buffer[] = new Array<Buffer>(4);
 
   // Load the image and extract the raw data
@@ -44,20 +34,13 @@ export const handlerSRGB = async <T extends object>({
       // Instead it changes the passed ArrayBuffer so that both it and the Uint8ClampedArray point to the same memory location.
       const pixelArray = new Uint8ClampedArray(bufferData.buffer);
 
-      // If configured via the parameters and the current channel is Alpha then fill it so there is no transparency
-      if (fillAlpha && currentChannel === 'alpha') {
-        pixelArray.fill(255);
-
-        // Convert the array to a buffer and store it
-        channelBufferArray[channelIndex] = Buffer.from(pixelArray);
-        return;
-      }
-
       // Process the channel data
-      processor({
+      await processor({
         pixelArray,
         height,
         width,
+        type: 'pixel',
+        currentChannel,
         ...params,
       });
 
@@ -71,12 +54,11 @@ export const handlerSRGB = async <T extends object>({
   checkFile(output);
 
   // Prepare the metadata for recombining the channel buffers
-  const dataChannelCount: ChannelCount = 1;
   const options = {
     raw: {
       width: width,
       height: height,
-      channels: dataChannelCount,
+      channels: 1 as const,
     },
   };
 

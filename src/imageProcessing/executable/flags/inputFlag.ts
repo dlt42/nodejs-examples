@@ -1,4 +1,4 @@
-import { FlagConfig, GrabFlagParams } from '../flag';
+import { FlagConfig, GrabFlagParams } from './flag';
 
 const inputConfig: FlagConfig<string> = {};
 
