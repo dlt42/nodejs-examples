@@ -15,13 +15,13 @@ Runs the app using the build.
 
 Builds the app in the `build` folder.
 
-#### `npm run test`
+#### `npm run Executable`
 
-Runs the `jest` tests.
+Runs the `jest` Executables.
 
-#### `npm run test:dev`
+#### `npm run Executable:dev`
 
-Run the `jest` tests in watch mode.
+Run the `jest` Executables in watch mode.
 
 #### `npm run prettier-format`
 
@@ -32,22 +32,29 @@ Formats the code.
 Format the code in watch mode.
 
 
-#### `npm run blockifyTest`
+#### `npm run blockifyExecutable`
 
 Examples:
 
 ```
-npm run blockifyTest -- --output ouputColBlockify.png --input input.png --split 40 
+npm run blockifyExecutable -- --output ouputColBlockify.png --input input.png --split 40 
 
-npm run blockifyTest -- --output ouputBWBlockify.png --input input.png --split 10 --mode bw
+npm run blockifyExecutable -- --output ouputBWBlockify.png --input input.png --split 10 --mode bw
 ```
 
-#### `npm run bandifyTest`
+#### `npm run bandifyExecutable`
 
 Examples:
 
 ```
-npm run bandifyTest -- --output ouputColBandify.png --input input.png --band 4 
+npm run bandifyExecutable -- --output ouputColBandify.png --input input.png --band 4 
 
-npm run bandifyTest -- --output ouputBWBandify.png --input input.png --band 8 --mode bw
+npm run bandifyExecutable -- --output ouputBWBandify.png --input input.png --band 8 --mode bw
 ```
+
+
+TODO: Remove this -
+npm run blockifyExecutable -- --output ouputColBlockify.png --input input.png --split 40 
+npm run blockifyExecutable -- --output ouputBWBlockify.png --input input.png --split 10 --mode bw
+npm run bandifyExecutable -- --output ouputColBandify.png --input input.png --band 4 
+npm run bandifyExecutable -- --output ouputBWBandify.png --input input.png --band 8 --mode bw
