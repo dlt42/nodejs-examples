@@ -9,22 +9,21 @@ import {
   BandifyParams,
   bandifyProcessor,
 } from '../processors/bandifyProcessor';
-import { pixelProcessorOperation } from '../operations/pixelProcessorOperation';
+import { pixelHandler } from '../handlers/pixelHandler';
 
 try {
   const mode = grabStringFlag(modeFlag);
   const output = grabStringFlag(outputFlag);
   const input = grabStringFlag(inputFlag);
   const band = grabNumericFlag(bandFlag);
-  pixelProcessorOperation<BandifyParams>(
-    {
-      input,
-      output,
-      band,
-      mode,
-    },
-    bandifyProcessor,
-  );
+
+  pixelHandler<BandifyParams>({
+    input,
+    output,
+    band,
+    mode,
+    processor: bandifyProcessor,
+  });
 } catch (e) {
   console.error(getErrorMessage(e));
   console.error(JSON.stringify(process.argv));

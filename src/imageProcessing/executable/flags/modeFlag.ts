@@ -1,4 +1,4 @@
-import { ModeOptions, modeOptions } from '../../operations/operation';
+import { ModeOptions, modeOptions } from '../../processors/processor';
 import { FlagConfig, GrabFlagParams } from './flag';
 
 const modeConfig: FlagConfig<ModeOptions> = {

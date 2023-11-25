@@ -1,22 +1,55 @@
-import { PixelProcessor } from './processor';
+import { PixelProcessorParams, Processor } from './processor';
 
-export const splitOptions = [2, 4, 6, 8, 10, 20, 30, 40, 50, 60, 70] as const;
+export const blockCountOptions = [
+  2, 4, 6, 8, 10, 20, 30, 40, 50, 60, 70,
+] as const;
 
-export type SplitOptions = (typeof splitOptions)[number];
+export type BlockCountOptions = (typeof blockCountOptions)[number];
 
 export type BlockifyParams = {
-  split: SplitOptions;
+  blockCount: BlockCountOptions;
   fillAlpha: boolean;
 };
 
-export const blockifyProcessor: PixelProcessor<BlockifyParams> = ({
-  width,
-  height,
-  split,
-  pixelArray,
-  fillAlpha,
-  currentChannel,
-}) => {
+type AxisRanges = {
+  sx: number;
+  ex: number;
+  sy: number;
+  ey: number;
+};
+
+type Range = {
+  start: number;
+  end: number;
+};
+
+type IterateBlockAxisCallback = (params: Range) => void;
+
+const iterateBlockAxis = (
+  blockCount: number,
+  blockLength: number,
+  length: number,
+  callback: IterateBlockAxisCallback,
+) => {
+  for (let x = 0; x < blockCount; x++) {
+    // Determine the start and end coordinates for an axis of the current block
+    const start = x * blockLength;
+    let end = (x + 1) * blockLength;
+
+    if (end > length) {
+      end = length;
+      if (start >= end) {
+        continue;
+      }
+    }
+    callback({ start, end });
+  }
+};
+
+export const blockifyProcessor: Processor<
+  BlockifyParams,
+  PixelProcessorParams
+> = ({ width, height, blockCount, pixelArray, fillAlpha, currentChannel }) => {
   // If configured via the parameters and the current channel is Alpha then fill it so there is no transparency
   if (fillAlpha && currentChannel === 'alpha') {
     pixelArray.fill(255);
@@ -24,47 +57,32 @@ export const blockifyProcessor: PixelProcessor<BlockifyParams> = ({
   }
 
   // Calculate the dimensions of each block
-  const blockWidth = Math.ceil(width / split);
-  const blockHeight = Math.ceil(height / split);
+  const blockWidth = Math.ceil(width / blockCount);
+  const blockHeight = Math.ceil(height / blockCount);
   const blockLength = blockWidth * blockHeight;
 
+  const calculateAverage = ({ sx, ex, sy, ey }: AxisRanges) => {
+    // Calculate the average value for the current block
+    let sum = 0;
+    const subArrays = [];
+    for (let iy = sy; iy < ey; iy++) {
+      const subArray = pixelArray.subarray(sx + width * iy, ex + width * iy);
+      sum += subArray.reduce((prev, current) => prev + current, 0);
+      subArrays.push(subArray);
+    }
+
+    // Fill the block with the average value
+    const average = sum / blockLength;
+    subArrays.forEach((subArray) => subArray.fill(average));
+  };
+
   // Iterate through the blocks to be processed
-  for (let x = 0; x < split; x++) {
-    // Determine the left and right coordinates of the current block
-    const sx = x * blockWidth;
-    let ex = (x + 1) * blockWidth;
-
-    if (ex > width) {
-      ex = width;
-      if (sx >= ex) {
-        continue;
-      }
-    }
-
-    for (let y = 0; y < split; y++) {
-      // Determine the top and bottom coordinates of the current block
-      const sy = y * blockHeight;
-      let ey = (y + 1) * blockHeight;
-
-      if (ey > height) {
-        ey = height;
-        if (sy >= ey) {
-          continue;
-        }
-      }
-
-      // Calculate the average value for the current block
-      let sum = 0;
-      const subArrays = [];
-      for (let iy = sy; iy < ey; iy++) {
-        const subArray = pixelArray.subarray(sx + width * iy, ex + width * iy);
-        sum += subArray.reduce((prev, current) => prev + current, 0);
-        subArrays.push(subArray);
-      }
-
-      // Fill the block with the average value
-      const average = sum / blockLength;
-      subArrays.forEach((subArray) => subArray.fill(average));
-    }
-  }
+  iterateBlockAxis(blockCount, blockWidth, width, ({ start: sx, end: ex }) =>
+    iterateBlockAxis(
+      blockCount,
+      blockHeight,
+      height,
+      ({ start: sy, end: ey }) => calculateAverage({ sx, ex, sy, ey }),
+    ),
+  );
 };
