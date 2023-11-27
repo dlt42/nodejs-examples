@@ -58,8 +58,9 @@ Examples:
 
 ```
 npm run splitifyExecutable -- --output ouputBWSplitify.png --input input.png --threshold 128
-```
 
+npm run splitifyExecutable -- --output ouputBWSplitify.png --input input.png --threshold 128 --mode bw
+```
 
 
 TODO: Remove this
@@ -67,4 +68,5 @@ npm run blockifyExecutable -- --output ouputColBlockify.png --input input.png --
 npm run blockifyExecutable -- --output ouputBWBlockify.png --input input.png --blockCount 10 --mode bw
 npm run bandifyExecutable -- --output ouputColBandify.png --input input.png --band 4 
 npm run bandifyExecutable -- --output ouputBWBandify.png --input input.png --band 8 --mode bw
-npm run splitifyExecutable -- --output ouputBWSplitify.png --input input.png --threshold 128
+npm run splitifyExecutable -- --output ouputColSplitify.png --input input.png --threshold 128
+npm run splitifyExecutable -- --output ouputBWSplitify.png --input input.png --threshold 128 --mode bw

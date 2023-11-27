@@ -9,5 +9,8 @@ export const splitifyProcessor: Processor<
   SharpProcessorParams
 > = async ({ sharp, threshold }) => {
   const sharpResult = await sharp.threshold(threshold);
+
+  // WIP
+
   return sharpResult;
 };

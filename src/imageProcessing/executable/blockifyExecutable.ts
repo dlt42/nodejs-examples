@@ -12,16 +12,11 @@ import {
 import { pixelHandler } from '../handlers/pixelHandler';
 
 try {
-  const mode = grabStringFlag(modeFlag);
-  const output = grabStringFlag(outputFlag);
-  const input = grabStringFlag(inputFlag);
-  const blockCount = grabNumericFlag(blockCountFlag);
-
   pixelHandler<BlockifyParams>({
-    input,
-    output,
-    blockCount,
-    mode,
+    mode: grabStringFlag(modeFlag),
+    output: grabStringFlag(outputFlag),
+    input: grabStringFlag(inputFlag),
+    blockCount: grabNumericFlag(blockCountFlag),
     fillAlpha: false,
     processor: blockifyProcessor,
   });

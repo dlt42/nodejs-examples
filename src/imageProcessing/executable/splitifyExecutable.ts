@@ -9,18 +9,15 @@ import {
   splitifyProcessor,
 } from '../processors/splitifyProcessor';
 import { sharpHandler } from '../handlers/sharpHandler';
+import { modeFlag } from './flags/modeFlag';
 
 try {
-  const output = grabStringFlag(outputFlag);
-  const input = grabStringFlag(inputFlag);
-  const threshold = grabRangedNumericFlag(thresholdFlag);
-
   sharpHandler<SplitifyParams>({
-    input,
-    output,
-    threshold,
+    input: grabStringFlag(inputFlag),
+    output: grabStringFlag(outputFlag),
+    threshold: grabRangedNumericFlag(thresholdFlag),
     processor: splitifyProcessor,
-    mode: 'col',
+    mode: grabStringFlag(modeFlag),
   });
 } catch (e) {
   console.error(getErrorMessage(e));

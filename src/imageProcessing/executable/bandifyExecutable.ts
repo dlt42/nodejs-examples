@@ -12,16 +12,11 @@ import {
 import { pixelHandler } from '../handlers/pixelHandler';
 
 try {
-  const mode = grabStringFlag(modeFlag);
-  const output = grabStringFlag(outputFlag);
-  const input = grabStringFlag(inputFlag);
-  const band = grabNumericFlag(bandFlag);
-
   pixelHandler<BandifyParams>({
-    input,
-    output,
-    band,
-    mode,
+    input: grabStringFlag(inputFlag),
+    output: grabStringFlag(outputFlag),
+    band: grabNumericFlag(bandFlag),
+    mode: grabStringFlag(modeFlag),
     processor: bandifyProcessor,
   });
 } catch (e) {
