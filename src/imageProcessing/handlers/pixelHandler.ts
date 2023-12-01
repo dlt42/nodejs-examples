@@ -1,13 +1,11 @@
 import sharp, { Sharp } from 'sharp';
 import {
-  Channel,
   PixelProcessorParam,
   PixelProcessorParams,
   Processor,
 } from '../processors/processor';
 import { checkFile } from './handlers';
-
-const SrgbChannels: Channel[] = ['red', 'green', 'blue', 'alpha'];
+import { Channel, SrgbChannels } from '../shared';
 
 export const pixelHandler = async <T extends object>(
   params: PixelProcessorParam<T>,
@@ -19,7 +17,7 @@ export const pixelHandler = async <T extends object>(
 
   // Load the image and extract the raw data
   const raw = await Promise.resolve(sharp(input))
-    .then((s) => s.ensureAlpha())
+    .then((s) => s.ensureAlpha(0))
     .then((s) =>
       mode === 'bw' ? s.toColourspace('b-w') : s.toColourspace('srgb'),
     )
@@ -72,13 +70,11 @@ export const pixelHandler = async <T extends object>(
     );
 
     // Recombine the channel buffers and output the result as a PNG
-    await sharp(channelBufferArray[0], options)
-      .joinChannel(channelBufferArray[1], options)
-      .joinChannel(channelBufferArray[2], options)
-      .joinChannel(channelBufferArray[3], options)
-      .toColourspace('srgb')
-      .toFormat('png')
-      .toFile(output);
+    let result = await sharp(channelBufferArray[0], options);
+    for (let i = 1; i < channelBufferArray.length; i++) {
+      result = await result.joinChannel(channelBufferArray[i], options);
+    }
+    await result.toFormat('png').toFile(output);
   }
 };
 

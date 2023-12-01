@@ -7,6 +7,7 @@ import { FlagConfig, GrabFlagParams } from './flag';
 const blockCountConfig: FlagConfig<BlockCountOptions> = {
   options: blockCountOptions,
   defaultValue: 20,
+  type: 'default',
 };
 
 export const blockCountFlag: GrabFlagParams<

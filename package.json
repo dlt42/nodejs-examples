@@ -27,6 +27,7 @@
   "license": "MIT",
   "dependencies": {
     "canvas": "^2.11.2",
+    "deep-copy-ts": "^0.5.4",
     "gifencoder": "^2.0.1",
     "is-valid-path": "^0.1.1",
     "jest-cucumber": "^3.0.1",

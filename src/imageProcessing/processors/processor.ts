@@ -1,5 +1,5 @@
 import { Sharp } from 'sharp';
-export type Channel = 'red' | 'green' | 'blue' | 'alpha';
+import { Channel } from '../shared';
 
 export const modeOptions = ['bw', 'col'] as const;
 
@@ -27,7 +27,8 @@ export type PixelProcessorParams = {
 
 export type SharpProcessorParams = {
   type: 'sharp';
-  sharp: Sharp;
+  raw: Sharp;
+  mode: ModeOptions;
 };
 
 export type PixelProcessorParam<T extends object> = Config<

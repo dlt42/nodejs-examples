@@ -3,19 +3,20 @@ import { getErrorMessage } from './executable';
 import { grabStringFlag, grabRangedNumericFlag } from './flags/flag';
 import { outputFlag } from './flags/outputFlag';
 import { inputFlag } from './flags/inputFlag';
-import { thresholdFlag } from './flags/thresholdFlag';
+import { thresholdFlag1, thresholdFlag2 } from './flags/thresholdFlag';
 import {
   SplitifyParams,
   splitifyProcessor,
 } from '../processors/splitifyProcessor';
-import { sharpHandler } from '../handlers/sharpHandler';
 import { modeFlag } from './flags/modeFlag';
+import { sharpHandler } from '../handlers/sharpHandler';
 
 try {
   sharpHandler<SplitifyParams>({
     input: grabStringFlag(inputFlag),
     output: grabStringFlag(outputFlag),
-    threshold: grabRangedNumericFlag(thresholdFlag),
+    t1: grabRangedNumericFlag(thresholdFlag1),
+    t2: grabRangedNumericFlag(thresholdFlag2),
     processor: splitifyProcessor,
     mode: grabStringFlag(modeFlag),
   });

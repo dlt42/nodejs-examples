@@ -12,10 +12,10 @@ export const sharpHandler = async <T extends object>(
 
   // Load the image and extract the raw data
   const raw = await Promise.resolve(sharp(input))
-    .then((s) => s.ensureAlpha())
     .then((s) =>
       mode === 'bw' ? s.toColourspace('b-w') : s.toColourspace('srgb'),
     )
+    .then((s) => s.ensureAlpha())
     .then((s) => s.raw());
 
   // Get the dimensions
@@ -28,7 +28,7 @@ export const sharpHandler = async <T extends object>(
   // Process the data
   const sharpResult = await processor({
     type: 'sharp',
-    sharp: raw,
+    raw,
     height,
     width,
     ...params,

@@ -1,6 +1,8 @@
 import { FlagConfig, GrabFlagParams } from './flag';
 
-const inputConfig: FlagConfig<string> = {};
+const inputConfig: FlagConfig<string> = {
+  type: 'required',
+};
 
 export const inputFlag: GrabFlagParams<string, typeof inputConfig> = {
   config: inputConfig,

@@ -4,6 +4,7 @@ import { FlagConfig, GrabFlagParams } from './flag';
 const modeConfig: FlagConfig<ModeOptions> = {
   options: modeOptions,
   defaultValue: 'col',
+  type: 'default',
 };
 
 export const modeFlag: GrabFlagParams<ModeOptions, typeof modeConfig> = {

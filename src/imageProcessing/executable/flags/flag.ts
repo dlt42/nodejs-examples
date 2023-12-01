@@ -14,12 +14,26 @@ type NumericAny<T> = IsUnion<T> extends true
   ? number
   : never;
 
-export type FlagConfig<T> = {
+type FlagConfigBase<T> = {
   options?: Options<T>;
-  defaultValue?: T;
   min?: NumericAny<T>;
   max?: NumericAny<T>;
 };
+
+type Required<T> = FlagConfigBase<T> & {
+  type: 'required';
+};
+
+type Optional<T> = FlagConfigBase<T> & {
+  type: 'optional';
+};
+
+type Default<T> = FlagConfigBase<T> & {
+  type: 'default';
+  defaultValue: T | undefined;
+};
+
+export type FlagConfig<T> = Required<T> | Optional<T> | Default<T>;
 
 type Flag<T, C extends FlagConfig<T>> = {
   config: C;
@@ -39,26 +53,33 @@ const getFlagError = ({ flag, message, description }: GetFlagErrorParams) => {
   return new Error(`Flag ${flag} : ${message} : ${description}`);
 };
 
+type ReturnType<T, C extends FlagConfig<T>> = C extends Required<T> | Default<T>
+  ? T
+  : T | undefined;
+
 const grabFlag = <T, C extends FlagConfig<T>>({
   config,
   description,
   flag,
   prepareValue,
   validateValue,
-}: Flag<T, C>): T => {
-  const { defaultValue, options } = config;
+}: Flag<T, C>): ReturnType<T, C> => {
+  const { options } = config;
   const flagIndex = process.argv.indexOf(flag);
   const valueIndex = flagIndex + 1;
 
   if (flagIndex < 0) {
-    if (defaultValue !== undefined) {
-      return defaultValue;
+    if (config.type === 'required') {
+      throw getFlagError({
+        flag,
+        message: 'flag not specified and is required',
+        description,
+      });
     }
-    throw getFlagError({
-      flag,
-      message: 'flag not specified and no default',
-      description,
-    });
+    if (config.type === 'default' && config.defaultValue !== undefined) {
+      return config.defaultValue;
+    }
+    return undefined as ReturnType<T, C>;
   }
 
   if (flagIndex !== process.argv.lastIndexOf(flag))
@@ -106,7 +127,7 @@ export type GrabFlagParams<T, C extends FlagConfig<T>> = Omit<
 
 export const grabStringFlag = <T, C extends FlagConfig<T>>(
   params: GrabFlagParams<T, C>,
-): T =>
+): ReturnType<T, C> =>
   grabFlag<T, C>({
     ...params,
     prepareValue: (value: string) => value as T,
@@ -114,7 +135,7 @@ export const grabStringFlag = <T, C extends FlagConfig<T>>(
 
 export const grabNumericFlag = <T, C extends FlagConfig<T>>(
   params: GrabFlagParams<T, C>,
-): T =>
+): ReturnType<T, C> =>
   grabFlag<T, C>({
     ...params,
     prepareValue: (flagValue: string) => {
@@ -132,7 +153,7 @@ export const grabNumericFlag = <T, C extends FlagConfig<T>>(
 
 export const grabRangedNumericFlag = <T, C extends FlagConfig<T>>(
   params: GrabFlagParams<T, C>,
-): T =>
+): ReturnType<T, C> =>
   grabFlag<T, C>({
     ...params,
     prepareValue: (flagValue: string) => {

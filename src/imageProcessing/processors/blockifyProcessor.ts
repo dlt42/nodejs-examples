@@ -31,10 +31,10 @@ const iterateBlockAxis = (
   length: number,
   callback: IterateBlockAxisCallback,
 ) => {
-  for (let x = 0; x < blockCount; x++) {
+  for (let i = 0; i < blockCount; i++) {
     // Determine the start and end coordinates for an axis of the current block
-    const start = x * blockLength;
-    let end = (x + 1) * blockLength;
+    const start = i * blockLength;
+    let end = (i + 1) * blockLength;
 
     if (end > length) {
       end = length;

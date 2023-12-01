@@ -4,6 +4,7 @@ import { FlagConfig, GrabFlagParams } from './flag';
 const bandConfig: FlagConfig<BandOptions> = {
   options: bandOptions,
   defaultValue: 4,
+  type: 'default',
 };
 
 export const bandFlag: GrabFlagParams<BandOptions, typeof bandConfig> = {
