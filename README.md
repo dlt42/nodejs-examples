@@ -72,3 +72,5 @@ npm run splitifyExecutable -- --output ouputColSplitify1.png --input input2.png 
 npm run splitifyExecutable -- --output ouputColSplitify2.png --input input2.png --t1 50 --t2 150
 npm run splitifyExecutable -- --output ouputBWSplitify1.png --input input2.png --t1 50 --mode bw
 npm run splitifyExecutable -- --output ouputBWSplitify2.png --input input2.png --t1 50 --t2 150 --mode bw
+
+npm run splitifyExecutable -- --output ouputColSplitify3.png --input input3.png --t1 50

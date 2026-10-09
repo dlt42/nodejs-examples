@@ -1,5 +1,5 @@
 export type Channel = 'red' | 'green' | 'blue' | 'alpha';
 export const SrgbChannels: Channel[] = ['red', 'green', 'blue', 'alpha'];
 
-export type BWChanel = 0 | 1;
-export const BwChannels: BWChanel[] = [0, 1];
+export type BWChannel = 0 | 1;
+export const BwChannels: BWChannel[] = [0, 1];

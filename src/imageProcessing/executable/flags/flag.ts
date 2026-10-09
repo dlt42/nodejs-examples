@@ -49,13 +49,20 @@ type GetFlagErrorParams = {
   description: string;
 };
 
+type GrabFlagReturnType<T, C extends FlagConfig<T>> = C extends
+  | Required<T>
+  | Default<T>
+  ? T
+  : T | undefined;
+
+export type GrabFlagParams<T, C extends FlagConfig<T>> = Omit<
+  Flag<T, C>,
+  'prepareValue' | 'validateValue'
+>;
+
 const getFlagError = ({ flag, message, description }: GetFlagErrorParams) => {
   return new Error(`Flag ${flag} : ${message} : ${description}`);
 };
-
-type ReturnType<T, C extends FlagConfig<T>> = C extends Required<T> | Default<T>
-  ? T
-  : T | undefined;
 
 const grabFlag = <T, C extends FlagConfig<T>>({
   config,
@@ -63,7 +70,7 @@ const grabFlag = <T, C extends FlagConfig<T>>({
   flag,
   prepareValue,
   validateValue,
-}: Flag<T, C>): ReturnType<T, C> => {
+}: Flag<T, C>): GrabFlagReturnType<T, C> => {
   const { options } = config;
   const flagIndex = process.argv.indexOf(flag);
   const valueIndex = flagIndex + 1;
@@ -79,7 +86,7 @@ const grabFlag = <T, C extends FlagConfig<T>>({
     if (config.type === 'default' && config.defaultValue !== undefined) {
       return config.defaultValue;
     }
-    return undefined as ReturnType<T, C>;
+    return undefined as GrabFlagReturnType<T, C>;
   }
 
   if (flagIndex !== process.argv.lastIndexOf(flag))
@@ -120,14 +127,9 @@ const grabFlag = <T, C extends FlagConfig<T>>({
   return value;
 };
 
-export type GrabFlagParams<T, C extends FlagConfig<T>> = Omit<
-  Flag<T, C>,
-  'prepareValue' | 'validateValue'
->;
-
 export const grabStringFlag = <T, C extends FlagConfig<T>>(
   params: GrabFlagParams<T, C>,
-): ReturnType<T, C> =>
+): GrabFlagReturnType<T, C> =>
   grabFlag<T, C>({
     ...params,
     prepareValue: (value: string) => value as T,
@@ -135,7 +137,7 @@ export const grabStringFlag = <T, C extends FlagConfig<T>>(
 
 export const grabNumericFlag = <T, C extends FlagConfig<T>>(
   params: GrabFlagParams<T, C>,
-): ReturnType<T, C> =>
+): GrabFlagReturnType<T, C> =>
   grabFlag<T, C>({
     ...params,
     prepareValue: (flagValue: string) => {
@@ -153,7 +155,7 @@ export const grabNumericFlag = <T, C extends FlagConfig<T>>(
 
 export const grabRangedNumericFlag = <T, C extends FlagConfig<T>>(
   params: GrabFlagParams<T, C>,
-): ReturnType<T, C> =>
+): GrabFlagReturnType<T, C> =>
   grabFlag<T, C>({
     ...params,
     prepareValue: (flagValue: string) => {
@@ -173,15 +175,65 @@ export const grabRangedNumericFlag = <T, C extends FlagConfig<T>>(
         if (params.config.max !== undefined && value > params.config.max)
           throw getFlagError({
             flag,
-            message: 'flag specified but value is greater than max',
+            message: `flag specified but value is greater than max (${params.config.max})`,
             description,
           });
         if (params.config.min !== undefined && value < params.config.min)
           throw getFlagError({
             flag,
-            message: 'flag specified but value is lesser than min',
+            message: `flag specified but value is lower than min (${params.config.min})`,
             description,
           });
+      }
+      return true;
+    },
+  });
+
+export const grabRangedNumericSeriesFlag = <
+  T extends number[],
+  C extends FlagConfig<T>,
+>(
+  params: GrabFlagParams<T, C>,
+): GrabFlagReturnType<T, C> =>
+  grabFlag<T, C>({
+    ...params,
+    prepareValue: (flagValue: string) => {
+      const { flag, description } = params;
+      const parts = flagValue.split(',');
+      if (parts.length % 2 !== 0) {
+        throw getFlagError({
+          flag,
+          message: 'flag specified but value is not a csv of even length',
+          description,
+        });
+      }
+      if (parts.some((part) => Number.isNaN(part))) {
+        throw getFlagError({
+          flag,
+          message:
+            'flag specified but not all of the csv elements are a number',
+          description,
+        });
+      }
+      return parts.map((part) => Number.parseInt(part)) as T;
+    },
+    validateValue: (value: T) => {
+      const { flag, description } = params;
+      if (Array.isArray(value) && typeof value[0] === 'number') {
+        value.forEach((current) => {
+          if (params.config.max !== undefined && current > params.config.max)
+            throw getFlagError({
+              flag,
+              message: `flag specified but not all csv values are less than or equal to max (${params.config.max})`,
+              description,
+            });
+          if (params.config.min !== undefined && current < params.config.min)
+            throw getFlagError({
+              flag,
+              message: `flag specified but not all csv values are greater than or equal to min (${params.config.min})`,
+              description,
+            });
+        });
       }
       return true;
     },
